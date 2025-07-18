@@ -83,4 +83,43 @@ export const GasChart: React.FC<GasChartProps> = ({ selectedChain, height = 400 
     if (!seriesRef.current) return;
 
     const chainData = chains[selectedChain];
+    if (!chainData || chainData.history.length === 0) return;
+
+    // Aggregate data to candlesticks
+    const candles = aggregateToCandles(chainData.history, CANDLESTICK_INTERVAL);
+    
+    // Convert to lightweight-charts format
+    const chartData = candles.map(candle => ({
+      time: Math.floor(candle.time / 1000), // Convert to seconds
+      open: candle.open,
+      high: candle.high,
+      low: candle.low,
+      close: candle.close,
+    }));
+
+    seriesRef.current.setData(chartData);
+  }, [chains, selectedChain]);
+
+  return (
+    <div className="card">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold">Gas Price Chart - {selectedChain.toUpperCase()}</h3>
+        <div className="flex items-center space-x-2">
+          <div 
+            className="w-3 h-3 rounded-full"
+            style={{ backgroundColor: getChainColor(selectedChain) }}
+          />
+          <span className="text-sm text-gray-600">
+            {mode === 'live' ? 'Live Updates' : 'Simulation Mode'}
+          </span>
+        </div>
+      </div>
+      <div ref={chartContainerRef} className="w-full" />
+    </div>
+  );
+};
+  useEffect(() => {
+    if (!seriesRef.current) return;
+
+    const chainData = chains[selectedChain];
     if (!chainData || chainData.history
