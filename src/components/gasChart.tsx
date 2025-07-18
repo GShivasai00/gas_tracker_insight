@@ -118,8 +118,3 @@ export const GasChart: React.FC<GasChartProps> = ({ selectedChain, height = 400 
     </div>
   );
 };
-  useEffect(() => {
-    if (!seriesRef.current) return;
-
-    const chainData = chains[selectedChain];
-    if (!chainData || chainData.history
